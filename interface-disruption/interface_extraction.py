@@ -42,7 +42,6 @@ def interface_extraction(kind):
     interface=sorted(list(set(interface)))
     
     
-    # print(interface)
     interfaces=interface[:]
     for i,e in enumerate(interfaces):
         if i==0:
@@ -51,10 +50,8 @@ def interface_extraction(kind):
             if e-interfaces[i-1] <= 10:
                 
                 for x in range(e-interfaces[i-1]-1):
-                    # print(x)
                     interface.append(interfaces[i-1]+x+1)
                 interface=sorted(interface)
-    # print(sorted(interface))   
     interface=sorted(interface)
     # the complementary interface score is the average of that regions
     separated_interfaces={}
