@@ -1,10 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Mar 31 14:51:59 2022
 
-@author: runfeng
-"""
 import subprocess as sp
 
 import os
@@ -52,29 +46,24 @@ def interface_extraction(pisa):
     for i,e in enumerate(interface):
         if len(separated_interfaces[z])==0:
             separated_interfaces[z].append(e)
-        elif e-separated_interfaces[z][-1] <10:
+        elif e-separated_interfaces[z][-1] <15:
             separated_interfaces[z].append(e)
-        elif e-separated_interfaces[z][-1]>=10:
+        elif e-separated_interfaces[z][-1]>=15:
              z+=1
              separated_interfaces[z]=[e]
     return interface,separated_interfaces,BSA
 
 #%%
-def interface_switch(seq_path,apisa,bpisa,aname,bname,path,good):
+def interface_switch(pdb_path,apisa,bpisa,aname,bname,good):
  
     #apply TMalign
     
-    aligned_residues = sp.getoutput(f'.../TMalign .../{aname}.pdb .../{bname}.pdb ')
-    # print(aligned_residues)
+    aligned_residues = sp.getoutput(f'.../TMalign {pdb_path}/{aname}.pdb {pdb_path}/{bname}.pdb ')
+    print(aligned_residues)
     a=aligned_residues.index("TM-score=")
     b=aligned_residues.index('(if normalized by length of Chain_2)')
     bench_score = float(aligned_residues[a+10:a+18])
     compare_score = float(aligned_residues[b-8:b])
-    # save the TMscore of alignment
-    f=open(f'{path}/TM_score.txt','a')
-    f.write(aname+'\t'+bname+'\t'+f'{bench_score:.3f}'+'\t'+f'{compare_score:.3f}'+'\n')
-    f.close()
-    
     
     s = int(aligned_residues.index('aligned residues)'))+len('aligned residues)')
     # extract the alignment residues from TMalign output
@@ -113,15 +102,17 @@ def interface_switch(seq_path,apisa,bpisa,aname,bname,path,good):
     sp_interface={}
     
     
-    for keys,vals in separated_interfaces.items():
-    
+    for keys,vals in bseq_separated_interfaces.items():
+        # print(len(vals))
         
-        for i, e in enumerate(aligned_residues[0]):
+        for i, e in enumerate(aligned_residues[2]):
+            # if the interface does not exits in the homomer, extend the region until it exists
             if e=='-' and i+1<=vals[0]:
                 vals=[x+1 for x in vals]
             elif e=='-' and i+1<=vals[-1] and i+1>vals[0]:
                 vals.append(vals[-1]+1)
-
+                # print(len(vals))
+        # print(len(vals))
         vs=vals[:]
         s=0
         z=vs[0]-2-s
@@ -144,9 +135,50 @@ def interface_switch(seq_path,apisa,bpisa,aname,bname,path,good):
     
             if z>=len(pair)-1:
                 break
-
+            
+        # print(len(vs))
+        sp_interface[keys] = vs   
+        aaligned[min(vs)-1:max(vs)] = baligned[min(vs)-1:max(vs)] 
+    
+    for keys,vals in separated_interfaces.items():
+        # print(len(vals))
+        
+        for i, e in enumerate(aligned_residues[0]):
+            # if the interface does not exits in the homomer, extend the region until it exists
+            if e=='-' and i+1<=vals[0]:
+                vals=[x+1 for x in vals]
+            elif e=='-' and i+1<=vals[-1] and i+1>vals[0]:
+                vals.append(vals[-1]+1)
+                # print(len(vals))
+        # print(len(vals))
+        vs=vals[:]
+        s=0
+        z=vs[0]-2-s
+        v0=vs[0]
+        good = good
+        good_align=[':' for d in range(good)]
+        # extend the regions until they are well aligned
+        while pair[z:z+good] != good_align and z>=0:
+            vs.insert(0,v0-1-s)
+            s+=1
+            z-=1
+    
+        s=0
+        z=vs[-1]+s
+        v1=vs[-1]
+        while pair[z-good:z] != good_align:
+            vs.append(v1+1+s)
+            s+=1
+            z+=1
+    
+            if z>=len(pair)-1:
+                break
+            
+        # print(len(vs))
         sp_interface[keys] = vs   
         baligned[min(vs)-1:max(vs)] = aaligned[min(vs)-1:max(vs)] 
+        
+    
     aaligned=''.join(aaligned)
     baligned=''.join(baligned)
     
@@ -251,11 +283,46 @@ def interface_switch(seq_path,apisa,bpisa,aname,bname,path,good):
             elif i>=max(val):
                 break
         other_interface['before'][key]=v 
-    
-    baligned = [x for x in baligned if x!='-']
-    baligned=''.join(baligned)
         
-    return domain_region,replaced_region,baligned
+    aaligned = [x for x in aaligned if x!='-']
+    baligned = [x for x in baligned if x!='-']
+    
+    baligned=''.join(baligned)
+    aaligned=''.join(aaligned)
+    return aaligned,baligned
+#%%
+pdb_path='pdb'
+apisa='1kfk_pisa'
+bpisa='3fca_pisa'
+aname='1kfk'
+bname='3fca'
+good=10
+a_sequence,b_sequence=interface_switch(pdb_path,apisa,bpisa,aname,bname,good)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
