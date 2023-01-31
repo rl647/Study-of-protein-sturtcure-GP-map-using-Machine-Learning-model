@@ -8,6 +8,8 @@ Prerequisites
   2)Porter5(https://github.com/mircare/Porter5)
   
   3)Alphafold2(https://github.com/deepmind/alphafold)
+  
+  4)Other packages can be installed via conda
 
 
 If you need the parameters of the ML model, please email: rl647@cam.ac.uk
