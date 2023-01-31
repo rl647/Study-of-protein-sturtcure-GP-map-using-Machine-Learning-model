@@ -6,14 +6,13 @@ Created on Tue Apr 19 18:23:46 2022
 @author: runfeng
 """
 
-
 import os
 import numpy as np
 #%%
 def interface_extraction(kind):
     interface = []
     BSA={}
-    f=open('....')
+    f=open(f'../pisa/{kind}')
     f=f.readlines()[1:]
     for line in f:
         if len(line)>1:
@@ -77,4 +76,52 @@ def interface_extraction(kind):
         score[keys]=s/site
     return BSA, interface, separated_interfaces, score
 
+#%%
 
+symmetric_BSA, symmetric_interface, symmetric_separated_interfaces, symmetric_score=interface_extraction('symmetric')
+
+asymmetric_BSA, asymmetric_interface, asymmetric_separated_interfaces, asymmetric_score=interface_extraction('asymmetric')
+
+
+si = symmetric_interface[:]
+ai = asymmetric_interface[:]
+for i in si:
+    if i in ai:
+        symmetric_interface.pop(symmetric_interface.index(i))
+
+for i in ai:
+    if i in si:
+        asymmetric_interface.pop(asymmetric_interface.index(i))
+
+for key,val in symmetric_separated_interfaces.items():
+    vs = val[:]
+    for i in val:
+        if i not in symmetric_interface:
+              vs.pop(vs.index(i))
+    symmetric_separated_interfaces[key] = vs
+    
+for key,val in asymmetric_separated_interfaces.items():
+    vs = val[:]
+    for i in val:
+        if i not in asymmetric_interface:
+              vs.pop(vs.index(i))
+    asymmetric_separated_interfaces[key] = vs
+
+#%%
+
+
+f=open(f'.../symmetric','w')
+f.write('loc'+'\t'+'reg'+'\t'+'score'+'\n')
+for key,val in symmetric_separated_interfaces.items():
+    s=np.sqrt(symmetric_score[key])
+    for i in val:
+        f.write(str(i)+'\t'+str(key)+'\t'+f'{s:.2f}'+'\n')
+f.close()
+
+f=open(f'.../asymmetric','w')
+f.write('loc'+'\t'+'reg'+'\t'+'score'+'\n')
+for key,val in asymmetric_separated_interfaces.items():
+    s=np.sqrt(asymmetric_score[key])
+    for i in val:
+        f.write(str(i)+'\t'+str(key)+'\t'+f'{s:.2f}'+'\n')
+f.close()
