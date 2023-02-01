@@ -97,16 +97,7 @@ for i in range(len(primary)-1):
         f.write(str(i*100)+'\t'+str(e*100)+'\t'+str(sim)+'\n')
         f.close()
 #%%
-num_pieces = {}
 
-for key,val in secondary.items():
-    asd = 0
-    for i,v in enumerate(val):
-        if i==len(val)-2:
-            pass
-        elif v=='H' and val[i+1] == 'C':
-            asd+=1
-    num_pieces[key] = asd
 
 
 
@@ -122,9 +113,8 @@ ts = {}
 f=open(f'.../secondary_score.txt')
 for line in f:
     s=line.strip().split('\t')
-    if float(s[-1])>0.7 and secondary[int(s[0])].count('H')/len(secondary[int(s[0])])>0.65 and secondary[int(s[1])].count('H')/len(secondary[int(s[0])])>0.65:
-        if num_pieces[int(s[0])] >=5 and num_pieces[int(s[1])]>=5:
-            ss[s[0]+'_'+s[1]] = float(s[-1])
+    if float(s[-1])>0.7:
+        ss[s[0]+'_'+s[1]] = float(s[-1])
 f.close()
 
 
