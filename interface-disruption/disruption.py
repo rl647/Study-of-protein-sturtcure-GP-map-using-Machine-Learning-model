@@ -98,9 +98,9 @@ def mutations(protein=protein, kind=kind, seq=seq, interface=interface, target_l
                 if mutant_sites != original_sites  and idx+1 in target_loc and mutant_sites == 'C':
                     score+=interface[idx+1]
                 elif mutant_sites != original_sites  and idx+1 not in interface:
-                    # score-=interface[i]
+                    score-=interface[i]
                 
-                    score-=0.2*interface[i]
+                    #score-=0.2*interface[i]
                 elif mutant_sites != original_sites  and idx+1 in interface:
                     score+=0.1
             
