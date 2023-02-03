@@ -58,8 +58,8 @@ def interface_switch(pdb_path,apisa,bpisa,aname,bname,good):
  
     #apply TMalign
     
-    aligned_residues = sp.getoutput(f'.../TMalign {pdb_path}/{aname}.pdb {pdb_path}/{bname}.pdb ')
-    print(aligned_residues)
+    aligned_residues = sp.getoutput(f'/home/runfeng/TMalign {pdb_path}/{aname}.pdb {pdb_path}/{bname}.pdb ')
+    # print(aligned_residues)
     a=aligned_residues.index("TM-score=")
     b=aligned_residues.index('(if normalized by length of Chain_2)')
     bench_score = float(aligned_residues[a+10:a+18])
@@ -101,7 +101,7 @@ def interface_switch(pdb_path,apisa,bpisa,aname,bname,good):
     # regions that will be replaced and include interfaces
     sp_interface={}
     
-    
+    aseq = aaligned[:]
     for keys,vals in bseq_separated_interfaces.items():
         # print(len(vals))
         
@@ -138,7 +138,7 @@ def interface_switch(pdb_path,apisa,bpisa,aname,bname,good):
             
         # print(len(vs))
         sp_interface[keys] = vs   
-        aaligned[min(vs)-1:max(vs)] = baligned[min(vs)-1:max(vs)] 
+        aseq[min(vs)-1:max(vs)] = baligned[min(vs)-1:max(vs)] 
     
     for keys,vals in separated_interfaces.items():
         # print(len(vals))
@@ -179,9 +179,9 @@ def interface_switch(pdb_path,apisa,bpisa,aname,bname,good):
         baligned[min(vs)-1:max(vs)] = aaligned[min(vs)-1:max(vs)] 
         
     
-    aaligned=''.join(aaligned)
+    aaligned=''.join(aseq)
     baligned=''.join(baligned)
-    
+
 
 
     # record the replaced region and its complementary region
